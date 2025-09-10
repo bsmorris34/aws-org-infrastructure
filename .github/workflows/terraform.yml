@@ -55,6 +55,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+        
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
