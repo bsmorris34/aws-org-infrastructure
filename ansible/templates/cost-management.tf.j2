@@ -1,7 +1,18 @@
+# KMS Key for SNS Topic encryption
+resource "aws_kms_key" "budget_alerts" {
+  description             = "KMS key for budget alerts SNS topic"
+  deletion_window_in_days = 7
+}
+
+resource "aws_kms_alias" "budget_alerts" {
+  name          = "alias/budget-alerts"
+  target_key_id = aws_kms_key.budget_alerts.key_id
+}
+
 # SNS Topic for Budget Alerts
 resource "aws_sns_topic" "budget_alerts" {
   name              = "budget-alerts"
-  kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = aws_kms_key.budget_alerts.arn
 }
 
 # SNS Topic Subscription
