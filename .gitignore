@@ -13,6 +13,8 @@ terraform.tfstate.backup
 
 # Generated files
 terraform/cost-management.tf.backup*
+*.backup*
+*.[0-9]*.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]@[0-9][0-9]:[0-9][0-9]:[0-9][0-9]
 
 # IDE
 .vscode/

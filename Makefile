@@ -49,7 +49,27 @@ test: validate
 	@. venv/bin/activate && pytest tests/ -v
 	@echo "✅ All tests passed!"
 
+# Integration tests
+test-integration:
+	@echo "🔗 Running integration tests..."
+	@. venv/bin/activate && python -m pytest tests/test_integration.py -v
+
+# Pipeline tests
+test-pipeline:
+	@echo "⚙️ Running pipeline tests..."
+	@. venv/bin/activate && python tests/test_pipeline.py
+
+# Disaster recovery tests
+test-dr:
+	@echo "🆘 Running disaster recovery tests..."
+	@. venv/bin/activate && python tests/test_disaster_recovery.py
+
+# Run all tests
+test-all: test test-pipeline test-dr
+	@echo "✅ All comprehensive tests passed!"
+
 # Clean generated files
 clean:
 	@echo "🧹 Cleaning generated files..."
-	@rm -f terraform/cost-management.tf.backup*
+	@find . -name "*.backup*" -delete 2>/dev/null || true
+	@find . -name "*.[0-9]*.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]@[0-9][0-9]:[0-9][0-9]:[0-9][0-9]" -delete 2>/dev/null || true
