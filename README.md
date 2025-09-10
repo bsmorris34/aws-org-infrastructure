@@ -31,6 +31,63 @@ Before running Terraform, the following must be configured manually in the **Man
 - **Enable AWS SSO** in the management account (if not already enabled)
 - **Configure identity source** (AWS SSO directory or external IdP)
 
+### 5. GitHub Actions OIDC Setup (for CI/CD)
+- **OIDC Provider**: Create GitHub Actions OIDC provider
+  ```bash
+  aws iam create-open-id-connect-provider \
+    --url https://token.actions.githubusercontent.com \
+    --thumbprint-list 6938fd4d98bab03faadb97b34396831e3780aea1 \
+    --client-id-list sts.amazonaws.com \
+    --profile management-org
+  ```
+- **GitHubActionsRole**: Create IAM role for CI/CD pipeline
+  ```bash
+  # Create trust policy (replace with your GitHub repo)
+  cat > github-actions-trust-policy.json << 'EOF'
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Federated": "arn:aws:iam::ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com"
+        },
+        "Action": "sts:AssumeRoleWithWebIdentity",
+        "Condition": {
+          "StringEquals": {
+            "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+            "token.actions.githubusercontent.com:sub": "repo:USERNAME/REPO_NAME:ref:refs/heads/main"
+          }
+        }
+      }
+    ]
+  }
+  EOF
+  
+  # Create role
+  aws iam create-role \
+    --role-name GitHubActionsRole \
+    --assume-role-policy-document file://github-actions-trust-policy.json \
+    --profile management-org
+  
+  # Attach policies
+  aws iam attach-role-policy \
+    --role-name GitHubActionsRole \
+    --policy-arn arn:aws:iam::aws:policy/AWSOrganizationsFullAccess \
+    --profile management-org
+  
+  aws iam attach-role-policy \
+    --role-name GitHubActionsRole \
+    --policy-arn arn:aws:iam::aws:policy/AWSBudgetsActionsWithAWSResourceControlAccess \
+    --profile management-org
+  
+  aws iam attach-role-policy \
+    --role-name GitHubActionsRole \
+    --policy-arn arn:aws:iam::aws:policy/IAMFullAccess \
+    --profile management-org
+  ```
+- **GitHub Secret**: Add `AWS_ROLE_ARN` secret with role ARN value
+
 ## What Terraform Will Manage
 
 - **Organizational Units**: Security OU, Workloads OU, Bramco OU
