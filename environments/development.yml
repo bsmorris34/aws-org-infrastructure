@@ -1,0 +1,27 @@
+# Development environment configuration
+aws_accounts:
+  management: "396913723725"
+  dev: "688567306703"
+  staging: "400205986141"
+  prod: "825765407025"
+
+budgets:
+  organization:
+    limit: 50  # Lower limit for development
+    currency: "USD"
+  accounts:
+    dev: 15
+    staging: 20
+    prod: 25
+
+notifications:
+  email: "bsmorris1+aws@gmail.com"
+  thresholds:
+    warning: 80
+    critical: 100
+
+cost_tags:
+  - Environment
+  - Project
+  - Owner
+  - CostCenter

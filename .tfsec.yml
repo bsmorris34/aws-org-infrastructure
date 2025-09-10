@@ -1,0 +1,9 @@
+# tfsec configuration for security scanning
+severity_overrides:
+  # Allow specific exceptions for our use case
+  aws-s3-enable-bucket-logging: LOW
+  aws-s3-enable-versioning: LOW
+
+exclude:
+  # Exclude rules that don't apply to our organization setup
+  - aws-iam-no-policy-wildcards  # We need wildcards for organization policies

@@ -1,0 +1,68 @@
+# SNS Topic for Budget Alerts
+resource "aws_sns_topic" "budget_alerts" {
+  name = "budget-alerts"
+}
+
+# SNS Topic Subscription
+resource "aws_sns_topic_subscription" "budget_email" {
+  topic_arn = aws_sns_topic.budget_alerts.arn
+  protocol  = "email"
+  endpoint  = "{{ notifications.email }}"
+}
+
+# Overall Organization Budget
+resource "aws_budgets_budget" "organization_monthly" {
+  name         = "organization-monthly-budget"
+  budget_type  = "COST"
+  limit_amount = "{{ budgets.organization.limit }}"
+  limit_unit   = "{{ budgets.organization.currency }}"
+  time_unit    = "MONTHLY"
+  
+{% for account_name, account_id in aws_accounts.items() %}
+  cost_filter {
+    name   = "LinkedAccount"
+    values = ["{{ account_id }}"]
+  }
+{% endfor %}
+
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                 = {{ notifications.thresholds.warning }}
+    threshold_type            = "PERCENTAGE"
+    notification_type          = "ACTUAL"
+    subscriber_email_addresses = ["{{ notifications.email }}"]
+  }
+
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                 = {{ notifications.thresholds.critical }}
+    threshold_type            = "PERCENTAGE"
+    notification_type          = "FORECASTED"
+    subscriber_email_addresses = ["{{ notifications.email }}"]
+  }
+}
+
+# Per-Account Budgets
+{% for account_name, limit in budgets.accounts.items() %}
+resource "aws_budgets_budget" "{{ account_name }}_account" {
+  name         = "{{ account_name }}-account-budget"
+  budget_type  = "COST"
+  limit_amount = "{{ limit }}"
+  limit_unit   = "{{ budgets.organization.currency }}"
+  time_unit    = "MONTHLY"
+  
+  cost_filter {
+    name   = "LinkedAccount"
+    values = ["{{ aws_accounts[account_name] }}"]
+  }
+
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                 = {{ notifications.thresholds.warning }}
+    threshold_type            = "PERCENTAGE"
+    notification_type          = "ACTUAL"
+    subscriber_email_addresses = ["{{ notifications.email }}"]
+  }
+}
+
+{% endfor %}
