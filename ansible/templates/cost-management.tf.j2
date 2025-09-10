@@ -2,6 +2,7 @@
 resource "aws_kms_key" "budget_alerts" {
   description             = "KMS key for budget alerts SNS topic"
   deletion_window_in_days = 7
+  enable_key_rotation     = true
 }
 
 resource "aws_kms_alias" "budget_alerts" {
