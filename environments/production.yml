@@ -7,12 +7,12 @@ aws_accounts:
 
 budgets:
   organization:
-    limit: 100  # Higher limit for production
+    limit: 50  # Higher limit for production
     currency: "USD"
   accounts:
-    dev: 25
-    staging: 35
-    prod: 40
+    dev: 10
+    staging: 15
+    prod: 25
 
 notifications:
   email: "bsmorris1+aws@gmail.com"
