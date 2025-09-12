@@ -2,7 +2,7 @@ name: Infrastructure CI/CD
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -34,17 +34,17 @@ jobs:
       
     - name: Terraform Format Check
       run: terraform fmt -check -recursive
-      working-directory: terraform
+      working-directory: aws/terraform
       
     - name: Generate Ansible Templates
       run: ansible-playbook playbooks/generate-terraform.yml
-      working-directory: ansible
+      working-directory: aws/ansible
       
     - name: Terraform Validate
       run: |
         terraform init -backend=false
         terraform validate
-      working-directory: terraform
+      working-directory: aws/terraform
 
   security-scan:
     name: Security Scan
@@ -70,12 +70,12 @@ jobs:
       
     - name: Generate Templates
       run: ansible-playbook playbooks/generate-terraform.yml
-      working-directory: ansible
+      working-directory: aws/ansible
       
     - name: Run tfsec
       uses: aquasecurity/tfsec-action@v1.0.3
       with:
-        working_directory: terraform
+        working_directory: aws/terraform
 
   plan:
     name: Terraform Plan
@@ -111,13 +111,13 @@ jobs:
         
     - name: Generate Templates
       run: ansible-playbook playbooks/generate-terraform.yml
-      working-directory: ansible
+      working-directory: aws/ansible
       
     - name: Terraform Plan
       run: |
         terraform init
         terraform plan -no-color
-      working-directory: terraform
+      working-directory: aws/terraform
 
   deploy:
     name: Deploy Infrastructure
@@ -154,10 +154,10 @@ jobs:
         
     - name: Generate Templates
       run: ansible-playbook playbooks/generate-terraform.yml
-      working-directory: ansible
+      working-directory: aws/ansible
       
     - name: Terraform Apply
       run: |
         terraform init
         terraform apply -auto-approve
-      working-directory: terraform
+      working-directory: aws/terraform
