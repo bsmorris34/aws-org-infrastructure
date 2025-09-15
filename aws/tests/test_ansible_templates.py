@@ -9,7 +9,7 @@ from pathlib import Path
 
 def test_ansible_config_valid():
     """Test that Ansible configuration is valid"""
-    config_path = Path("ansible/group_vars/all.yml")
+    config_path = Path("ansible/group_vars/production.yml")
     assert config_path.exists(), "Ansible config file missing"
     
     with open(config_path) as f:

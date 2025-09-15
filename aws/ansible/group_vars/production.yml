@@ -1,4 +1,4 @@
-# Development environment configuration
+# Organization management configuration
 aws_accounts:
   management: "396913723725"
   dev: "688567306703"
@@ -7,18 +7,18 @@ aws_accounts:
 
 budgets:
   organization:
-    limit: 50  # Lower limit for development
+    limit: 100  # Organization-wide budget limit
     currency: "USD"
   accounts:
-    dev: 15
-    staging: 20
+    dev: 10
+    staging: 15
     prod: 25
 
 notifications:
   email: "bsmorris1+aws@gmail.com"
   thresholds:
     warning: 80
-    critical: 100
+    critical: 90  # Earlier warning for production
 
 cost_tags:
   - Environment

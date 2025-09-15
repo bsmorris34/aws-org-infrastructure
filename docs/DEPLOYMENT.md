@@ -43,8 +43,8 @@ Run daily to check for configuration drift:
 
 ## Environment Management
 
-Configuration files in `environments/`:
-- `development.yml` - Lower cost limits for testing
+Configuration files in `ansible/group_vars/`:
+- `production.yml` - Organization management configuration
 - `production.yml` - Production-ready configuration
 
 ## Testing
