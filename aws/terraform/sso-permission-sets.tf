@@ -40,6 +40,24 @@ resource "aws_ssoadmin_managed_policy_attachment" "infrastructure_admin_s3" {
   permission_set_arn = aws_ssoadmin_permission_set.infrastructure_admin.arn
 }
 
+resource "aws_ssoadmin_managed_policy_attachment" "infrastructure_admin_iam" {
+  instance_arn       = tolist(data.aws_ssoadmin_instances.main.arns)[0]
+  managed_policy_arn = "arn:aws:iam::aws:policy/IAMFullAccess"
+  permission_set_arn = aws_ssoadmin_permission_set.infrastructure_admin.arn
+}
+
+resource "aws_ssoadmin_managed_policy_attachment" "infrastructure_admin_cloudwatch" {
+  instance_arn       = tolist(data.aws_ssoadmin_instances.main.arns)[0]
+  managed_policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+  permission_set_arn = aws_ssoadmin_permission_set.infrastructure_admin.arn
+}
+
+resource "aws_ssoadmin_managed_policy_attachment" "infrastructure_admin_apigateway" {
+  instance_arn       = tolist(data.aws_ssoadmin_instances.main.arns)[0]
+  managed_policy_arn = "arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator"
+  permission_set_arn = aws_ssoadmin_permission_set.infrastructure_admin.arn
+}
+
 # Assign Brandon to InfrastructureAdmin in Management Account
 resource "aws_ssoadmin_account_assignment" "brandon_infra_mgmt" {
   instance_arn       = tolist(data.aws_ssoadmin_instances.main.arns)[0]
