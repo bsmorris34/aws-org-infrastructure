@@ -125,6 +125,52 @@ resource "aws_ssoadmin_managed_policy_attachment" "app_deployer_dynamodb" {
   permission_set_arn = aws_ssoadmin_permission_set.application_deployer.arn
 }
 
+# Custom inline policy for ApplicationDeployer - minimal IAM permissions for Lambda deployment
+resource "aws_ssoadmin_permission_set_inline_policy" "app_deployer_iam_policy" {
+  instance_arn       = tolist(data.aws_ssoadmin_instances.main.arns)[0]
+  permission_set_arn = aws_ssoadmin_permission_set.application_deployer.arn
+  
+  inline_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowLambdaRoleManagement"
+        Effect = "Allow"
+        Action = [
+          "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:GetRole",
+          "iam:PassRole",
+          "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:GetRolePolicy",
+          "iam:ListAttachedRolePolicies",
+          "iam:ListRolePolicies"
+        ]
+        Resource = [
+          "arn:aws:iam::*:role/bramco-*-lambda-*",
+          "arn:aws:iam::*:role/lambda-*"
+        ]
+      },
+      {
+        Sid    = "AllowManagedPolicyAccess"
+        Effect = "Allow"
+        Action = [
+          "iam:GetPolicy",
+          "iam:GetPolicyVersion",
+          "iam:ListPolicyVersions"
+        ]
+        Resource = [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/AWSLambdaExecute"
+        ]
+      }
+    ]
+  })
+}
+
 # Assign Brandon to ApplicationDeployer in Management Account
 resource "aws_ssoadmin_account_assignment" "brandon_app_mgmt" {
   instance_arn       = tolist(data.aws_ssoadmin_instances.main.arns)[0]
