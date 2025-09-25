@@ -86,6 +86,36 @@ Before running Terraform, the following must be configured manually in the **Man
     --policy-arn arn:aws:iam::aws:policy/IAMFullAccess \
     --profile management-org
   ```
+- **SNS Permissions for CI/CD**: Add SNS permissions to GitHubActionsRole (required for budget alerts)
+  ```bash
+  # Add SNS permissions manually (role has 10 policy limit)
+  aws iam put-role-policy \
+    --role-name GitHubActionsRole \
+    --policy-name GitHubActionsSNSAccess \
+    --policy-document '{
+      "Version": "2012-10-17",
+      "Statement": [{
+        "Effect": "Allow",
+        "Action": [
+          "sns:GetTopicAttributes",
+          "sns:SetTopicAttributes", 
+          "sns:CreateTopic",
+          "sns:DeleteTopic",
+          "sns:Subscribe",
+          "sns:Unsubscribe",
+          "sns:ListTagsForResource",
+          "sns:GetSubscriptionAttributes",
+          "sns:SetSubscriptionAttributes",
+          "sns:ListSubscriptionsByTopic"
+        ],
+        "Resource": [
+          "arn:aws:sns:*:*:budget-alerts",
+          "arn:aws:sns:*:*:budget-alerts:*"
+        ]
+      }]
+    }' \
+    --profile management-org
+  ```
 - **GitHub Secret**: Add `AWS_ROLE_ARN` secret with role ARN value
 
 ## What Terraform Will Manage
